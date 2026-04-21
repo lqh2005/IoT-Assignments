@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geofence Notification System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+        
+        .section h2 {
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        input[type="number"], input[type="email"], input[type="tel"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="number"]:focus, input[type="email"]:focus, input[type="tel"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+            width: 100%;
+        }
+        
+        button:hover {
+            background: #764ba2;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .status.active {
+            display: block;
+        }
+        
+        .status.inside {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        
+        .status.outside {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #bee5eb;
+        }
+        
+        .info-table {
+            width: 100%;
+            margin-top: 15px;
+            border-collapse: collapse;
+        }
+        
+        .info-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .info-table td:first-child {
+            font-weight: 600;
+            color: #667eea;
+            width: 150px;
+        }
+        
+        .distance {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .note {
+            font-size: 12px;
+            color: #999;
+            margin-top: 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📍 Geofence Notification System</h1>
+        
+        <div class="section">
+            <h2>Geofence Settings</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Center Latitude</label>
+                    <input type="number" id="centerLat" value="40.7128" step="0.0001" placeholder="e.g., 40.7128">
+                </div>
+                <div class="form-group">
+                    <label>Center Longitude</label>
+                    <input type="number" id="centerLon" value="-74.0060" step="0.0001" placeholder="e.g., -74.0060">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Radius (km)</label>
+                <input type="number" id="radius" value="5" min="0.1" step="0.1" placeholder="e.g., 5">
+            </div>
+            <p class="note">Example: New York City coordinates (40.7128, -74.0060) with 5km radius</p>
+        </div>
+        
+        <div class="section">
+            <h2>Notification Settings</h2>
+            <div class="form-group">
+                <label>Email Address (for SendGrid notifications)</label>
+                <input type="email" id="notificationEmail" placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+                <label>Phone Number (for Twilio SMS)</label>
+                <input type="tel" id="notificationPhone" placeholder="+1234567890">
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>GPS Coordinates</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Latitude</label>
+                    <input type="number" id="gpsLat" value="40.7580" step="0.0001" placeholder="e.g., 40.7580">
+                </div>
+                <div class="form-group">
+                    <label>Longitude</label>
+                    <input type="number" id="gpsLon" value="-73.9855" step="0.0001" placeholder="e.g., -73.9855">
+                </div>
+            </div>
+            <button onclick="checkGeofence()">Check Location</button>
+            <p class="note">Example: Times Square (40.7580, -73.9855)</p>
+        </div>
+        
+        <div id="result" class="status"></div>
+        
+        <div class="section" id="detailsSection" style="display: none;">
+            <h2>Location Details</h2>
+            <div class="distance" id="distanceDisplay"></div>
+            <table class="info-table">
+                <tr>
+                    <td>Your Location:</td>
+                    <td id="yourLocation"></td>
+                </tr>
+                <tr>
+                    <td>Geofence Center:</td>
+                    <td id="geofenceCenter"></td>
+                </tr>
+                <tr>
+                    <td>Geofence Radius:</td>
+                    <td id="geofenceRadius"></td>
+                </tr>
+                <tr>
+                    <td>Status:</td>
+                    <td id="statusText" style="font-weight: bold;"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <script src="geofence-notify.js"></script>
+    <script>
+        function checkGeofence() {
+            const centerLat = parseFloat(document.getElementById('centerLat').value);
+            const centerLon = parseFloat(document.getElementById('centerLon').value);
+            const radius = parseFloat(document.getElementById('radius').value);
+            const gpsLat = parseFloat(document.getElementById('gpsLat').value);
+            const gpsLon = parseFloat(document.getElementById('gpsLon').value);
+            
+            if (!centerLat || !centerLon || !radius || !gpsLat || !gpsLon) {
+                showResult('Please fill in all coordinates', 'info');
+                return;
+            }
+            
+            const notifier = new GeofenceNotifier(centerLat, centerLon, radius);
+            const event = notifier.checkBoundaryCross(gpsLat, gpsLon);
+            
+            let message = `Distance from geofence: ${event.distance} km\n`;
+            let statusClass = event.isInside ? 'inside' : 'outside';
+            
+            if (event.entered) {
+                message += '✅ You just ENTERED the geofence!';
+                sendNotification('entered');
+            } else if (event.exited) {
+                message += '❌ You just EXITED the geofence!';
+                sendNotification('exited');
+            } else if (event.isInside) {
+                message += '✅ You are INSIDE the geofence';
+            } else {
+                message += '❌ You are OUTSIDE the geofence';
+            }
+            
+            showResult(message, statusClass);
+            displayDetails(gpsLat, gpsLon, centerLat, centerLon, radius, event.distance, event.isInside);
+        }
+        
+        function showResult(message, className) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = message;
+            resultDiv.className = `status active ${className}`;
+        }
+        
+        function displayDetails(lat, lon, centerLat, centerLon, radius, distance, isInside) {
+            document.getElementById('yourLocation').textContent = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+            document.getElementById('geofenceCenter').textContent = `${centerLat.toFixed(4)}, ${centerLon.toFixed(4)}`;
+            document.getElementById('geofenceRadius').textContent = `${radius} km`;
+            document.getElementById('statusText').textContent = isInside ? 'INSIDE ✅' : 'OUTSIDE ❌';
+            document.getElementById('distanceDisplay').textContent = `${distance} km away`;
+            document.getElementById('detailsSection').style.display = 'block';
+        }
+        
+        function sendNotification(event) {
+            const email = document.getElementById('notificationEmail').value;
+            const phone = document.getElementById('notificationPhone').value;
+            
+            if (!email && !phone) {
+                console.warn('No notification method configured');
+                return;
+            }
+            
+            // In production, this would call your Azure Function
+            // with Twilio/SendGrid bindings
+            
+            const data = {
+                event: event,
+                email: email,
+                phone: phone,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('Sending notification:', data);
+            
+            // POST to Azure Function: /api/notify-geofence
+            // fetch('/api/notify-geofence', {
+            //     method: 'POST',
+            //     body: JSON.stringify(data),
+            //     headers: { 'Content-Type': 'application/json' }
+            // });
+        }
+    </script>
+</body>
+</html>
