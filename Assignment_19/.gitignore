@@ -1,0 +1,56 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Unit test / coverage
+.coverage
+.pytest_cache/
+htmlcov/
+
+# Environments
+.env
+venv/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+fruit_data/          # Large dataset not committed
+models/              # Trained models (too large)
+*.h5                 # Model files
+*.pkl                # Pickle files
+*.jpg                # Images
+*.png                # Images
+*.log                # Log files
+comparison_results.json
+domain_comparison.png
