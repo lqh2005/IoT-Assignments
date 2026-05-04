@@ -1,0 +1,42 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution
+build/
+dist/
+*.egg-info/
+
+# Unit test / coverage
+.coverage
+.pytest_cache/
+htmlcov/
+
+# Environments
+.env
+.env.local
+venv/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+captures/
+cloud_storage/
+*.log
+detection_results.jsonl
+test_*.txt
+test_uploads/
+test_captures/
